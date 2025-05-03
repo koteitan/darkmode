@@ -9,39 +9,6 @@ function convert_pixel(rgb) {
     const G = rgb[1];
     const B = rgb[2];
     
-    
-    if (R === 0 && G === 0 && B === 0) {
-        return [1.0, 1.0, 1.0];
-    }
-    
-    if (R === 1 && G === 1 && B === 1) {
-        return [0.0, 0.0, 0.0];
-    }
-    
-    if (R === 1 && G === 0 && B === 0) {
-        return [1.0, 0.333, 0.333];
-    }
-    
-    if (R === 0 && G === 1 && B === 0) {
-        return [0.333, 1.0, 0.333];
-    }
-    
-    if (R === 0 && G === 0 && B === 1) {
-        return [0.333, 0.333, 1.0];
-    }
-    
-    if (R === 0 && G === 1 && B === 1) {
-        return [0.333, 0.667, 0.667];
-    }
-    
-    if (R === 1 && G === 0 && B === 1) {
-        return [0.667, 0.333, 0.667];
-    }
-    
-    if (R === 1 && G === 1 && B === 0) {
-        return [0.667, 0.667, 0.333];
-    }
-    
     const X = (2*R - G - B) / Math.sqrt(6);
     const Y = (G - B) / Math.sqrt(2);
     const Z = (R + G + B) / Math.sqrt(3);
@@ -68,9 +35,29 @@ function convert_pixel(rgb) {
         Y_prime = (C_prime / C) * Y;
     }
     
-    const R2 = (2*X_prime/Math.sqrt(6) + Z_prime/Math.sqrt(3));
-    const G2 = (-X_prime/Math.sqrt(6) + Y_prime/Math.sqrt(2) + Z_prime/Math.sqrt(3));
-    const B2 = (-X_prime/Math.sqrt(6) - Y_prime/Math.sqrt(2) + Z_prime/Math.sqrt(3));
+    const sqrt3 = Math.sqrt(3);
+    const offset = 0.333 * sqrt3;
+    
+    let R2 = (2*X_prime/Math.sqrt(6) + Z_prime/Math.sqrt(3));
+    let G2 = (-X_prime/Math.sqrt(6) + Y_prime/Math.sqrt(2) + Z_prime/Math.sqrt(3));
+    let B2 = (-X_prime/Math.sqrt(6) - Y_prime/Math.sqrt(2) + Z_prime/Math.sqrt(3));
+    
+    if ((R === 0 && G === 1 && B === 1) || // Cyan
+        (R === 1 && G === 0 && B === 1) || // Magenta
+        (R === 1 && G === 1 && B === 0)) { // Yellow
+        
+        if (R === 0 && G === 1 && B === 1 && R2 < 0.1) {
+            R2 = 0.333;
+        }
+        
+        if (R === 1 && G === 0 && B === 1 && G2 < 0.1) {
+            G2 = 0.333;
+        }
+        
+        if (R === 1 && G === 1 && B === 0 && B2 < 0.1) {
+            B2 = 0.333;
+        }
+    }
     
     return [
         Math.max(0, Math.min(1, R2)),
