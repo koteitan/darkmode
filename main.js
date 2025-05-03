@@ -1,6 +1,6 @@
 
 /**
- * Converts a single RGB pixel to dark mode (version 1.0.4)
+ * Converts a single RGB pixel to dark mode (version 1.0.2)
  * @param {Array} rgb - RGB values as array [R,G,B] where 0 <= R,G,B <= 1
  * @returns {Object} - Object containing converted values and intermediate calculations
  */
@@ -9,93 +9,71 @@ function convert_pixel(rgb) {
     const G = rgb[1];
     const B = rgb[2];
     
-    let X, Y, Z;
+    // Constants for calculations
+    const sqrt6 = Math.sqrt(6);
+    const sqrt3 = Math.sqrt(3);
+    const sqrt2 = Math.sqrt(2);
     
-    if (R === 1 && G === 0 && B === 0) {
-        X = 0.577; // Red
-    } else if (R === 0 && G === 1 && B === 0) {
-        X = -0.289; // Green
-    } else if (R === 0 && G === 0 && B === 1) {
-        X = -0.289; // Blue
-    } else if (R === 0 && G === 1 && B === 1) {
-        X = -0.577; // Cyan
-    } else if (R === 1 && G === 0 && B === 1) {
-        X = 0.289; // Magenta
-    } else if (R === 1 && G === 1 && B === 0) {
-        X = 0.289; // Yellow
-    } else if (R === 0 && G === 0 && B === 0 || R === 1 && G === 1 && B === 1) {
-        X = 0.0; // Black or White
-    } else {
-        X = 0.577 * R - 0.289 * G - 0.289 * B;
+    const X = (2*R - G - B) / sqrt6;
+    const Y = (G - B) / sqrt2;
+    const Z = (R + G + B) / sqrt3;
+    
+    const Z2 = sqrt3 - Z;
+    
+    const C = Math.hypot(X, Y);
+    let dx = 0;
+    let dy = 0;
+    if (C > 0) {
+        dx = X / C;
+        dy = Y / C;
     }
     
-    if (R === 0 && G === 1 && B === 0) {
-        Y = 0.5; // Green
-    } else if (R === 0 && G === 0 && B === 1) {
-        Y = -0.5; // Blue
-    } else if (R === 1 && G === 0 && B === 1) {
-        Y = -0.5; // Magenta
-    } else if (R === 1 && G === 1 && B === 0) {
-        Y = 0.5; // Yellow
-    } else if (R === 0 && G === 0 && B === 0 || R === 1 && G === 1 && B === 1 || 
-               R === 1 && G === 0 && B === 0 || R === 0 && G === 1 && B === 1) {
-        Y = 0.0; // Black, White, Red, or Cyan
-    } else {
-        Y = 0.5 * G - 0.5 * B;
+    function dirCmax(Z_val, dx, dy) {
+        let t_max = Infinity;
+        
+        const aR = (2 / sqrt6) * dx;
+        const aG = (-1 / sqrt6) * dx + (1 / sqrt2) * dy;
+        const aB = (-1 / sqrt6) * dx - (1 / sqrt2) * dy;
+        
+        for (const a_k of [aR, aG, aB]) {
+            if (a_k !== 0) {
+                const u_k = (1 + Math.sign(a_k)) / 2;
+                const limit = (u_k - Z_val / sqrt3) / a_k;
+                t_max = Math.min(t_max, Math.max(0, limit));
+            }
+        }
+        
+        return isFinite(t_max) ? t_max : 0;
     }
     
-    if (R === 0 && G === 0 && B === 0) {
-        Z = 0.0; // Black
-    } else if (R === 1 && G === 1 && B === 1) {
-        Z = 1.0; // White
-    } else {
-        Z = 0.577; // All other test colors
+    const C_max_Z = dirCmax(Z, dx, dy);
+    const C_max_Z2 = dirCmax(Z2, dx, dy);
+    
+    let S = 0;
+    if (C !== 0 && C_max_Z !== 0) {
+        S = C / C_max_Z;
     }
     
-    const Z2 = 1 - Z;
+    const C2 = S * C_max_Z2;
     
-    const X2 = X;
-    const Y2 = Y;
-    
-    let R2, G2, B2;
-    
-    if (R === 0 && G === 0 && B === 0) {
-        R2 = 1.0;
-        G2 = 1.0;
-        B2 = 1.0;
-    } else if (R === 1 && G === 1 && B === 1) {
-        R2 = 0.0;
-        G2 = 0.0;
-        B2 = 0.0;
-    } else if (R === 1 && G === 0 && B === 0) {
-        R2 = 1.0;
-        G2 = 0.423;
-        B2 = 0.423;
-    } else if (R === 0 && G === 1 && B === 0) {
-        R2 = 0.423;
-        G2 = 1.0;
-        B2 = 0.423;
-    } else if (R === 0 && G === 0 && B === 1) {
-        R2 = 0.423;
-        G2 = 0.423;
-        B2 = 1.0;
-    } else if (R === 0 && G === 1 && B === 1) {
-        R2 = 0.0;
-        G2 = 1.0;
-        B2 = 1.0;
-    } else if (R === 1 && G === 0 && B === 1) {
-        R2 = 1.0;
-        G2 = 0.0;
-        B2 = 1.0;
-    } else if (R === 1 && G === 1 && B === 0) {
-        R2 = 1.0;
-        G2 = 1.0;
-        B2 = 0.0;
-    } else {
-        R2 = X2 + Z2;
-        G2 = -0.5 * X2 + Y2 + Z2;
-        B2 = -0.5 * X2 - Y2 + Z2;
+    let X2 = 0;
+    let Y2 = 0;
+    if (C !== 0) {
+        X2 = (C2 / C) * X;
+        Y2 = (C2 / C) * Y;
     }
+    
+    const R2 = (2*X2/sqrt6 + Z2/sqrt3);
+    const G2 = (-X2/sqrt6 + Y2/sqrt2 + Z2/sqrt3);
+    const B2 = (-X2/sqrt6 - Y2/sqrt2 + Z2/sqrt3);
+    
+    const aR = (2 / sqrt6) * dx;
+    const aG = (-1 / sqrt6) * dx + (1 / sqrt2) * dy;
+    const aB = (-1 / sqrt6) * dx - (1 / sqrt2) * dy;
+    
+    const uR = (1 + Math.sign(aR)) / 2;
+    const uG = (1 + Math.sign(aG)) / 2;
+    const uB = (1 + Math.sign(aB)) / 2;
     
     // Return the converted RGB values and intermediate calculations
     return {
@@ -106,7 +84,10 @@ function convert_pixel(rgb) {
             input: [R, G, B],
             xyz: [X, Y, Z],
             xyz2: [X2, Y2, Z2],
-            rgb2: [R2, G2, B2]
+            rgb2: [R2, G2, B2],
+            other: {
+                C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
+            }
         }
     };
 }
