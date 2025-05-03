@@ -15,8 +15,8 @@ function convert_pixel(rgb) {
     const sqrt2 = Math.sqrt(2);
     
     const X = (2*R - G - B) / sqrt6;
-    const Y = (G - B) / sqrt2;
-    const Z = (R + G + B) / sqrt3;
+    const Y = (    + G - B) / sqrt2;
+    const Z = (  R + G + B) / sqrt3;
     
     const Z2 = sqrt3 - Z;
     

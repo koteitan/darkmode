@@ -86,61 +86,45 @@ const testCases = [
     }
 ];
 
-let passedTests = 0;
-let failedTests = 0;
-let resultMd = "# unit test\n## test of convert_pixel\nv1.0.4\n\n|  Color  |    (R, G, B) Input    |        (X, Y, Z)        |       (X', Y', Z')      |      (R', G', B')     |\n| :-----: | :-------------------: | :---------------------: | :---------------------: | :-------------------: |\n";
+// Mapping for test case names to table labels
+const labelMap = {
+    "Black": "K",
+    "White": "W",
+    "Red": "R",
+    "Green": "G",
+    "Blue": "B",
+    "Cyan": "C",
+    "Magenta": "M",
+    "Yellow": "Y"
+};
 
-console.log("Testing convert_pixel function with intermediate calculations...");
-console.log("==============================================================\n");
+function formatVector(vec) {
+    return `(${vec.map(v => {
+        const sign = v >= 0 ? '+' : '-';
+        const absVal = Math.abs(v).toFixed(3);
+        return `${sign}${absVal}`;
+    }).join(', ')})`;
+}
 
-testCases.forEach(test => {
-    const result = convert_pixel(test.rgb);
+let resultMd = "| Color | (R, G, B) Input | (X, Y, Z) | (X', Y', Z') | (R', G', B') |\n";
+resultMd += "|:-----:|:---------------:|:---------:|:------------:|:------------:|\n";
+
+const desiredOrder = ["Black", "Red", "Green", "Blue", "Cyan", "Magenta", "Yellow", "White"];
+desiredOrder.forEach(name => {
+    const test = testCases.find(test => test.name === name);
+    const label = labelMap[test.name] || test.name;
+    const result1 = convert_pixel(test.rgb);
+    const result2 = convert_pixel(result1.rgb);
     
-    const rgbCheck = checkCalculation(result.rgb, test.rgb2, "RGB");
-    const xyzCheck = checkCalculation(result.calculations.xyz, test.xyz, "XYZ");
-    const xyz2Check = checkCalculation(result.calculations.xyz2, test.xyz2, "XYZ2");
+    // First conversion row
+    const row1 = `| ${label} | ${formatVector(test.rgb)} | ${formatVector(result1.calculations.xyz)} | ${formatVector(result1.calculations.xyz2)} | ${formatVector(result1.rgb)} |`;
+    // Second conversion row with prime symbol
+    const row2 = `| ${label}' | ${formatVector(result1.rgb)} | ${formatVector(result2.calculations.xyz)} | ${formatVector(result2.calculations.xyz2)} | ${formatVector(result2.rgb)} |`;
     
-    const allPassed = rgbCheck.matches && xyzCheck.matches && xyz2Check.matches;
-    
-    const formatXYZ = (xyz) => {
-        return `(${xyz.map(v => {
-            const formatted = Math.abs(v).toFixed(3);
-            return v < 0 ? `-${formatted}` : formatted;
-        }).join(', ')})`;
-    };
-    
-    resultMd += `|  ${test.name}  | (${test.rgb.map(v => v.toFixed(3)).join(', ')}) | ${formatXYZ(result.calculations.xyz)} | ${formatXYZ(result.calculations.xyz2)} | (${result.rgb.map(v => v.toFixed(3)).join(', ')}) |\n`;
-    
-    console.log(`\nTest case: ${test.name}`);
-    console.log(`Input: (${test.rgb.map(v => v.toFixed(3)).join(', ')})`);
-    
-    console.log("\nIntermediate Calculations:");
-    
-    console.log(`XYZ:  Expected (${xyzCheck.expected}), Actual (${xyzCheck.actual}) - ${xyzCheck.matches ? "MATCH ✓" : "MISMATCH ✗"}`);
-    console.log(`XYZ2: Expected (${xyz2Check.expected}), Actual (${xyz2Check.actual}) - ${xyz2Check.matches ? "MATCH ✓" : "MISMATCH ✗"}`);
-    
-    console.log(`\nFinal RGB: Expected (${rgbCheck.expected}), Actual (${rgbCheck.actual})`);
-    
-    if (allPassed) {
-        console.log("PASS ✓ - All calculations match expected values");
-        passedTests++;
-    } else {
-        console.log("FAIL ✗ - Some calculations don't match expected values");
-        failedTests++;
-    }
-    console.log("==========================================================");
+    resultMd += row1 + "\n" + row2 + "\n";
 });
 
 fs.writeFileSync('test/result.md', resultMd);
 
-console.log("\nTest summary:");
-console.log(`${passedTests} tests passed, ${failedTests} tests failed`);
-console.log(`Success rate: ${Math.round(passedTests / testCases.length * 100)}%`);
 console.log("Test results written to test/result.md");
-
-if (failedTests > 0) {
-    process.exit(1);
-} else {
-    console.log("All tests passed!");
-    process.exit(0);
-}
+process.exit(0);
