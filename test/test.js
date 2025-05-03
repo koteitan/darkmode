@@ -88,7 +88,7 @@ const testCases = [
 
 let passedTests = 0;
 let failedTests = 0;
-let resultMd = "# unit test\n## test of convert_pixel\nversion 1.0.2\n| Color | (R, G, B) Input | (X, Y, Z) | (X′, Y′, Z′) | (R′, G′, B′) |\n|:----:|:---------------:|:---------------------------:|:---------------------------:|:---------------------------:|\n";
+let resultMd = "# unit test\n## test of convert_pixel\nv1.0.2\n\n| Color |    (R, G, B) Input    |        (X, Y, Z)        |       (X', Y', Z')      |      (R', G', B')     |\n| :---: | :-------------------: | :---------------------: | :---------------------: | :-------------------: |\n";
 
 console.log("Testing convert_pixel function with intermediate calculations...");
 console.log("==============================================================\n");
@@ -102,7 +102,16 @@ testCases.forEach(test => {
     
     const allPassed = rgbCheck.matches && xyzCheck.matches && xyz2Check.matches;
     
-    resultMd += `| ${test.name} | (${test.rgb.map(v => v.toFixed(3)).join(', ')}) | (${result.calculations.xyz.map(v => v.toFixed(3)).join(', ')}) | (${result.calculations.xyz2.map(v => v.toFixed(3)).join(', ')}) | (${result.rgb.map(v => v.toFixed(3)).join(', ')}) |\n`;
+    const colorCode = test.name.split(' ')[0];
+    
+    const formatXYZ = (xyz) => {
+        return `(${xyz.map(v => {
+            const formatted = Math.abs(v).toFixed(3);
+            return v < 0 ? `–${formatted}` : formatted;
+        }).join(', ')})`;
+    };
+    
+    resultMd += `|   ${colorCode}   | (${test.rgb.map(v => v.toFixed(3)).join(', ')}) | ${formatXYZ(result.calculations.xyz)} | ${formatXYZ(result.calculations.xyz2)} | (${result.rgb.map(v => v.toFixed(3)).join(', ')}) |\n`;
     
     console.log(`\nTest case: ${test.name}`);
     console.log(`Input: (${test.rgb.map(v => v.toFixed(3)).join(', ')})`);
