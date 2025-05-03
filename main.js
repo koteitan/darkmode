@@ -33,14 +33,6 @@ function convert_pixel(rgb) {
     if (C !== 0) {
         X2 = (C2 / C) * X;
         Y2 = (C2 / C) * Y;
-        
-        if ((R === 0 && G === 1 && B === 1) || // Cyan
-            (R === 1 && G === 0 && B === 1) || // Magenta
-            (R === 1 && G === 1 && B === 0)) { // Yellow
-            
-            X2 = X * 0.5;
-            Y2 = Y * 0.5;
-        }
     }
     
     const R2 = (2*X2/Math.sqrt(6) + Z2/Math.sqrt(3));
