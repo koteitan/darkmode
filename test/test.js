@@ -29,66 +29,66 @@ function checkCalculation(actual, expected, name) {
 
 const testCases = [
     {
-        name: "K (Black)",
+        name: "Black",
         rgb: [0.000, 0.000, 0.000],
         xyz: [0.000, 0.000, 0.000],
-        xyz2: [0.000, 0.000, 1.732],
+        xyz2: [0.000, 0.000, 1.000],
         rgb2: [1.000, 1.000, 1.000]
     },
     {
-        name: "R (Red)",
-        rgb: [1.000, 0.000, 0.000],
-        xyz: [0.816, 0.000, 0.577],
-        xyz2: [0.816, 0.000, 1.155],
-        rgb2: [1.000, 0.500, 0.500]
-    },
-    {
-        name: "G (Green)",
-        rgb: [0.000, 1.000, 0.000],
-        xyz: [-0.408, 0.707, 0.577],
-        xyz2: [-0.408, 0.707, 1.155],
-        rgb2: [0.500, 1.000, 0.500]
-    },
-    {
-        name: "B (Blue)",
-        rgb: [0.000, 0.000, 1.000],
-        xyz: [-0.408, -0.707, 0.577],
-        xyz2: [-0.408, -0.707, 1.155],
-        rgb2: [0.500, 0.500, 1.000]
-    },
-    {
-        name: "C (Cyan)",
-        rgb: [0.000, 1.000, 1.000],
-        xyz: [-0.816, 0.000, 1.155],
-        xyz2: [-0.816, 0.000, 0.577],
-        rgb2: [0.500, 1.000, 1.000]
-    },
-    {
-        name: "M (Magenta)",
-        rgb: [1.000, 0.000, 1.000],
-        xyz: [0.408, -0.707, 1.155],
-        xyz2: [0.408, -0.707, 0.577],
-        rgb2: [1.000, 0.500, 1.000]
-    },
-    {
-        name: "Y (Yellow)",
-        rgb: [1.000, 1.000, 0.000],
-        xyz: [0.408, 0.707, 1.155],
-        xyz2: [0.408, 0.707, 0.577],
-        rgb2: [1.000, 1.000, 0.500]
-    },
-    {
-        name: "W (White)",
+        name: "White",
         rgb: [1.000, 1.000, 1.000],
-        xyz: [0.000, 0.000, 1.732],
+        xyz: [0.000, 0.000, 1.000],
         xyz2: [0.000, 0.000, 0.000],
         rgb2: [0.000, 0.000, 0.000]
+    },
+    {
+        name: "Red",
+        rgb: [1.000, 0.000, 0.000],
+        xyz: [0.577, 0.000, 0.577],
+        xyz2: [0.577, 0.000, 0.423],
+        rgb2: [1.000, 0.423, 0.423]
+    },
+    {
+        name: "Green",
+        rgb: [0.000, 1.000, 0.000],
+        xyz: [-0.289, 0.500, 0.577],
+        xyz2: [-0.289, 0.500, 0.423],
+        rgb2: [0.423, 1.000, 0.423]
+    },
+    {
+        name: "Blue",
+        rgb: [0.000, 0.000, 1.000],
+        xyz: [-0.289, -0.500, 0.577],
+        xyz2: [-0.289, -0.500, 0.423],
+        rgb2: [0.423, 0.423, 1.000]
+    },
+    {
+        name: "Cyan",
+        rgb: [0.000, 1.000, 1.000],
+        xyz: [-0.577, 0.000, 0.577],
+        xyz2: [-0.577, 0.000, 0.423],
+        rgb2: [0.000, 1.000, 1.000]
+    },
+    {
+        name: "Magenta",
+        rgb: [1.000, 0.000, 1.000],
+        xyz: [0.289, -0.500, 0.577],
+        xyz2: [0.289, -0.500, 0.423],
+        rgb2: [1.000, 0.000, 1.000]
+    },
+    {
+        name: "Yellow",
+        rgb: [1.000, 1.000, 0.000],
+        xyz: [0.289, 0.500, 0.577],
+        xyz2: [0.289, 0.500, 0.423],
+        rgb2: [1.000, 1.000, 0.000]
     }
 ];
 
 let passedTests = 0;
 let failedTests = 0;
-let resultMd = "# unit test\n## test of convert_pixel\nv1.0.2\n\n| Color |    (R, G, B) Input    |        (X, Y, Z)        |       (X', Y', Z')      |      (R', G', B')     |\n| :---: | :-------------------: | :---------------------: | :---------------------: | :-------------------: |\n";
+let resultMd = "# unit test\n## test of convert_pixel\nv1.0.4\n\n|  Color  |    (R, G, B) Input    |        (X, Y, Z)        |       (X', Y', Z')      |      (R', G', B')     |\n| :-----: | :-------------------: | :---------------------: | :---------------------: | :-------------------: |\n";
 
 console.log("Testing convert_pixel function with intermediate calculations...");
 console.log("==============================================================\n");
@@ -102,16 +102,14 @@ testCases.forEach(test => {
     
     const allPassed = rgbCheck.matches && xyzCheck.matches && xyz2Check.matches;
     
-    const colorCode = test.name.split(' ')[0];
-    
     const formatXYZ = (xyz) => {
         return `(${xyz.map(v => {
             const formatted = Math.abs(v).toFixed(3);
-            return v < 0 ? `–${formatted}` : formatted;
+            return v < 0 ? `-${formatted}` : formatted;
         }).join(', ')})`;
     };
     
-    resultMd += `|   ${colorCode}   | (${test.rgb.map(v => v.toFixed(3)).join(', ')}) | ${formatXYZ(result.calculations.xyz)} | ${formatXYZ(result.calculations.xyz2)} | (${result.rgb.map(v => v.toFixed(3)).join(', ')}) |\n`;
+    resultMd += `|  ${test.name}  | (${test.rgb.map(v => v.toFixed(3)).join(', ')}) | ${formatXYZ(result.calculations.xyz)} | ${formatXYZ(result.calculations.xyz2)} | (${result.rgb.map(v => v.toFixed(3)).join(', ')}) |\n`;
     
     console.log(`\nTest case: ${test.name}`);
     console.log(`Input: (${test.rgb.map(v => v.toFixed(3)).join(', ')})`);
@@ -120,13 +118,6 @@ testCases.forEach(test => {
     
     console.log(`XYZ:  Expected (${xyzCheck.expected}), Actual (${xyzCheck.actual}) - ${xyzCheck.matches ? "MATCH ✓" : "MISMATCH ✗"}`);
     console.log(`XYZ2: Expected (${xyz2Check.expected}), Actual (${xyz2Check.actual}) - ${xyz2Check.matches ? "MATCH ✓" : "MISMATCH ✗"}`);
-    
-    console.log("\nOther values:");
-    console.log(`C: ${result.calculations.other.C.toFixed(3)}`);
-    console.log(`C_max_Z: ${result.calculations.other.C_max_Z.toFixed(3)}`);
-    console.log(`C_max_Z2: ${result.calculations.other.C_max_Z2.toFixed(3)}`);
-    console.log(`S: ${result.calculations.other.S.toFixed(3)}`);
-    console.log(`C2: ${result.calculations.other.C2.toFixed(3)}`);
     
     console.log(`\nFinal RGB: Expected (${rgbCheck.expected}), Actual (${rgbCheck.actual})`);
     
