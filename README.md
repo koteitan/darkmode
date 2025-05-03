@@ -1,87 +1,120 @@
 # darkmode
+
 my darkmode conversion (program by Devin)
 
 ## conversion specification
-version 1.0.0
+
+version 1.0.1
+
 ### Normalized orthogonal basis
+
 ```tex
 \[
-\begin{aligned}
-\mathbf{e}_x &= \dfrac{1}{\sqrt{6}} (2,\,-1,\,-1), \\[24pt]
-\mathbf{e}_y &= \dfrac{1}{\sqrt{2}} (0,\,1,\,-1), \\[24pt]
-\mathbf{e}_z &= \dfrac{1}{\sqrt{3}} (1,\,1,\,1),
-\end{aligned}
+T=
+\begin{pmatrix}
+\frac{2}{\sqrt6} &-\frac{1}{\sqrt6} &-\frac{1}{\sqrt6}\\[6pt]
+0                & \frac{1}{\sqrt2} &-\frac{1}{\sqrt2}\\[6pt]
+\frac{1}{\sqrt3} & \frac{1}{\sqrt3} & \frac{1}{\sqrt3}
+\end{pmatrix},
+\qquad
+\mathbf e_x,\mathbf e_y,\mathbf e_z\ \text{are its row vectors.}
 \]
-where \(\mathbf{e}_x, \mathbf{e}_y, \mathbf{e}_z\) are orthonormal and span the RGB space.
 ```
 
 ### Transformation
+
 ```tex
 \[
 \begin{pmatrix}
 X \\ Y \\ Z
 \end{pmatrix}
 =
-\begin{pmatrix}
-\dfrac{2}{\sqrt{6}} & -\dfrac{1}{\sqrt{6}} & -\dfrac{1}{\sqrt{6}} \\[24pt]
-0 & \dfrac{1}{\sqrt{2}} & -\dfrac{1}{\sqrt{2}} \\[24pt]
-\dfrac{1}{\sqrt{3}} & \dfrac{1}{\sqrt{3}} & \dfrac{1}{\sqrt{3}}
-\end{pmatrix}
+T
 \begin{pmatrix}
 R \\ G \\ B
-\end{pmatrix}
+\end{pmatrix},
+\qquad
+C=\sqrt{X^{2}+Y^{2}},\quad
+\hat{\mathbf c}=(X,Y)/C\ \text{ if }C\ne0.
 \]
 ```
+
 ### Dark mode conversion
+
 ```tex
 \[
+Z' = \sqrt3 - Z.
+\]
+
+\[
+\text{For direction }\hat{\mathbf c}=(d_x,d_y),\quad
+C_{\max}(Z,\hat{\mathbf c})=\min_{k\in\{R,G,B\}}
+\frac{\bigl[u_k-(Z/\sqrt3)\bigr]_+}{a_k},
+\]
+where  
+\[
 \begin{aligned}
-Z' &= \sqrt{3} - Z \\[24pt]
-C &= \sqrt{X^2 + Y^2} \\[24pt]
-C_{\max}(Z) &= \sqrt{2} \cdot \min\bigl(Z, \sqrt{3} - Z\bigr) \\[24pt]
-C_{\max}(Z') &= \sqrt{2} \cdot \min\bigl(Z', \sqrt{3} - Z'\bigr) \\[24pt]
-S &= \begin{cases}
-0 & (C = 0) \\[24pt]
-\dfrac{C}{C_{\max}(Z)} & (C \neq 0)
-\end{cases} \\[24pt]
-C' &= S \cdot C_{\max}(Z') \\[24pt]
-(X', Y') &= \begin{cases}
-(0, 0) & (C = 0) \\[24pt]
-\dfrac{C'}{C} (X, Y) & (C \neq 0)
-\end{cases}
+&u_R,u_G,u_B\in\{0,1\} \text{ are the RGB bounds,} \quad [x]_+=\max(0,x),\\
+&(a_R,a_G,a_B)=\bigl(\tfrac{2}{\sqrt6}d_x,\,
+                     -\tfrac{1}{\sqrt6}d_x+\tfrac{1}{\sqrt2}d_y,\,
+                     -\tfrac{1}{\sqrt6}d_x-\tfrac{1}{\sqrt2}d_y\bigr).
 \end{aligned}
 \]
+
+Saturation:  
+\[
+S=\begin{cases}
+0 & (C=0),\\[6pt]
+\dfrac{C}{C_{\max}(Z,\hat{\mathbf c})} & (C\ne0).
+\end{cases}
+\]
+
+New chroma:  
+\[
+C' = S \; C_{\max}(Z',\hat{\mathbf c}),\qquad
+(X',Y')=\begin{cases}
+(0,0) & (C=0),\\[6pt]
+\dfrac{C'}{C}\,(X,Y) & (C\ne0).
+\end{cases}
+\]
 ```
+
 ### Inverse transformation
+
 ```tex
 \[
 \begin{pmatrix}
 R' \\ G' \\ B'
 \end{pmatrix}
 =
-\begin{pmatrix}
-\dfrac{2}{\sqrt{6}} & 0 & \dfrac{1}{\sqrt{3}} \\[24pt]
--\dfrac{1}{\sqrt{6}} & \dfrac{1}{\sqrt{2}} & \dfrac{1}{\sqrt{3}} \\[24pt]
--\dfrac{1}{\sqrt{6}} & -\dfrac{1}{\sqrt{2}} & \dfrac{1}{\sqrt{3}}
-\end{pmatrix}
+T^{\mathsf T}
 \begin{pmatrix}
 X' \\ Y' \\ Z'
-\end{pmatrix}
+\end{pmatrix},
+\quad\text{ i.e. }\quad
+\begin{cases}
+R'=\dfrac{2}{\sqrt6}X' + \dfrac{1}{\sqrt3}Z',\\[6pt]
+G'=-\dfrac{1}{\sqrt6}X' + \dfrac{1}{\sqrt2}Y' + \dfrac{1}{\sqrt3}Z',\\[6pt]
+B'=-\dfrac{1}{\sqrt6}X' - \dfrac{1}{\sqrt2}Y' + \dfrac{1}{\sqrt3}Z'.
+\end{cases}
 \]
 ```
 
 ## test site specification
-- main.js
-  - 'convert' function to convert whole input image to output image using 'convert_pixel' function.
-  - 'convert_pixel' function to convert RGB to R'G'B'
-    - input: array of [R,G,B] (0<=R,G,B<=1)
-    - output: array of [R',G',B'], converted by version 1.0.0
-- index.html
-  - input image
-  - output image (saved by right click)
-  - image loading button
-    - load new image from file selection dialog onto input image
-  - convert button
-    - convert input image to output image
-  - no javascript
-- others you need(css and so on)
+
+* main.js
+  * 'convert' function: converts the entire input image to an output image using the 'convert\_pixel' function.
+  * 'convert\_pixel' function: converts RGB to R'G'B'
+    * input: array of \[R, G, B] (0 <= R, G, B <= 1)
+    * output: array of \[R', G', B'], converted by version 1.0.1 (direction-dependent chroma limit)
+* index.html
+  * input image
+  * output image (can be saved by right-clicking)
+  * image loading button
+    * loads a new image from file selection dialog onto the input image
+  * convert button
+    * converts the input image to the output image
+  * no additional JavaScript libraries
+* others (CSS and supporting files as needed)
+
+
