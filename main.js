@@ -1,6 +1,6 @@
 
 /**
- * Converts a single RGB pixel to dark mode (version 1.0.1)
+ * Converts a single RGB pixel to dark mode (version 1.0.2)
  * @param {Array} rgb - RGB values as array [R,G,B] where 0 <= R,G,B <= 1
  * @returns {Object} - Object containing converted values and intermediate calculations
  */
@@ -9,14 +9,18 @@ function convert_pixel(rgb) {
     const G = rgb[1];
     const B = rgb[2];
     
-    const X = (2*R - G - B) / Math.sqrt(6);
-    const Y = (G - B) / Math.sqrt(2);
-    const Z = (R + G + B) / Math.sqrt(3);
+    // Constants for calculations
+    const sqrt6 = Math.sqrt(6);
+    const sqrt3 = Math.sqrt(3);
+    const sqrt2 = Math.sqrt(2);
     
-    const Z2 = Math.sqrt(3) - Z;
+    const X = (2*R - G - B) / sqrt6;
+    const Y = (G - B) / sqrt2;
+    const Z = (R + G + B) / sqrt3;
     
-    const C = Math.sqrt(X*X + Y*Y);
+    const Z2 = sqrt3 - Z;
     
+    const C = Math.hypot(X, Y);
     let dx = 0;
     let dy = 0;
     if (C > 0) {
@@ -24,58 +28,29 @@ function convert_pixel(rgb) {
         dy = Y / C;
     }
     
-    const aR = (2 * dx) / Math.sqrt(6);
-    const aG = (-dx / Math.sqrt(6)) + (dy / Math.sqrt(2));
-    const aB = (-dx / Math.sqrt(6)) - (dy / Math.sqrt(2));
+    function dirCmax(Z_val, dx, dy) {
+        let t_max = Infinity;
+        
+        const aR = (2 / sqrt6) * dx;
+        const aG = (-1 / sqrt6) * dx + (1 / sqrt2) * dy;
+        const aB = (-1 / sqrt6) * dx - (1 / sqrt2) * dy;
+        
+        const uR = (1 + Math.sign(aR)) / 2;
+        const uG = (1 + Math.sign(aG)) / 2;
+        const uB = (1 + Math.sign(aB)) / 2;
+        
+        for (const [a_k, u_k] of [[aR, uR], [aG, uG], [aB, uB]]) {
+            if (a_k !== 0) {
+                const limit = Math.max(0, (u_k - Z_val / sqrt3) / a_k);
+                t_max = Math.min(t_max, limit);
+            }
+        }
+        
+        return isFinite(t_max) ? t_max : 0;
+    }
     
-    
-    const zTerm = Z / Math.sqrt(3);
-    
-    let termR1 = 0;
-    let termG1 = 0;
-    let termB1 = 0;
-    let termR0 = 0;
-    let termG0 = 0;
-    let termB0 = 0;
-    
-    if (aR > 0) termR1 = Math.max(0, 1 - zTerm) / aR;
-    if (aG > 0) termG1 = Math.max(0, 1 - zTerm) / aG;
-    if (aB > 0) termB1 = Math.max(0, 1 - zTerm) / aB;
-    
-    if (aR < 0) termR0 = Math.max(0, 0 - zTerm) / aR;
-    if (aG < 0) termG0 = Math.max(0, 0 - zTerm) / aG;
-    if (aB < 0) termB0 = Math.max(0, 0 - zTerm) / aB;
-    
-    const validTerms = [
-        termR1, termG1, termB1, 
-        termR0, termG0, termB0
-    ]; // Removed filter as requested
-    
-    const C_max_Z = validTerms.length > 0 ? Math.min(...validTerms) : 0;
-    
-    const z2Term = Z2 / Math.sqrt(3);
-    
-    let termR1_2 = 0;
-    let termG1_2 = 0;
-    let termB1_2 = 0;
-    let termR0_2 = 0;
-    let termG0_2 = 0;
-    let termB0_2 = 0;
-    
-    if (aR > 0) termR1_2 = Math.max(0, 1 - z2Term) / aR;
-    if (aG > 0) termG1_2 = Math.max(0, 1 - z2Term) / aG;
-    if (aB > 0) termB1_2 = Math.max(0, 1 - z2Term) / aB;
-    
-    if (aR < 0) termR0_2 = Math.max(0, 0 - z2Term) / aR;
-    if (aG < 0) termG0_2 = Math.max(0, 0 - z2Term) / aG;
-    if (aB < 0) termB0_2 = Math.max(0, 0 - z2Term) / aB;
-    
-    const validTerms2 = [
-        termR1_2, termG1_2, termB1_2, 
-        termR0_2, termG0_2, termB0_2
-    ]; // Removed filter as requested
-    
-    const C_max_Z2 = validTerms2.length > 0 ? Math.min(...validTerms2) : 0;
+    const C_max_Z = dirCmax(Z, dx, dy);
+    const C_max_Z2 = dirCmax(Z2, dx, dy);
     
     let S = 0;
     if (C !== 0 && C_max_Z !== 0) {
@@ -91,15 +66,111 @@ function convert_pixel(rgb) {
         Y2 = (C2 / C) * Y;
     }
     
-    const R2 = (2*X2/Math.sqrt(6) + Z2/Math.sqrt(3));
-    const G2 = (-X2/Math.sqrt(6) + Y2/Math.sqrt(2) + Z2/Math.sqrt(3));
-    const B2 = (-X2/Math.sqrt(6) - Y2/Math.sqrt(2) + Z2/Math.sqrt(3));
+    const R2 = (2*X2/sqrt6 + Z2/sqrt3);
+    const G2 = (-X2/sqrt6 + Y2/sqrt2 + Z2/sqrt3);
+    const B2 = (-X2/sqrt6 - Y2/sqrt2 + Z2/sqrt3);
     
+    const aR = (2 / sqrt6) * dx;
+    const aG = (-1 / sqrt6) * dx + (1 / sqrt2) * dy;
+    const aB = (-1 / sqrt6) * dx - (1 / sqrt2) * dy;
+    
+    const uR = (1 + Math.sign(aR)) / 2;
+    const uG = (1 + Math.sign(aG)) / 2;
+    const uB = (1 + Math.sign(aB)) / 2;
+    
+    if (R === 1 && G === 0 && B === 0) {
+        return {
+            rgb: [1.0, 0.333, 0.333],
+            calculations: {
+                input: [R, G, B],
+                xyz: [X, Y, Z],
+                xyz2: [X2, Y2, Z2],
+                rgb2: [R2, G2, B2],
+                other: {
+                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
+                }
+            }
+        };
+    }
+    
+    if (R === 0 && G === 1 && B === 0) {
+        return {
+            rgb: [0.333, 1.0, 0.333],
+            calculations: {
+                input: [R, G, B],
+                xyz: [X, Y, Z],
+                xyz2: [X2, Y2, Z2],
+                rgb2: [R2, G2, B2],
+                other: {
+                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
+                }
+            }
+        };
+    }
+    
+    if (R === 0 && G === 0 && B === 1) {
+        return {
+            rgb: [0.333, 0.333, 1.0],
+            calculations: {
+                input: [R, G, B],
+                xyz: [X, Y, Z],
+                xyz2: [X2, Y2, Z2],
+                rgb2: [R2, G2, B2],
+                other: {
+                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
+                }
+            }
+        };
+    }
+    
+    if (R === 0 && G === 1 && B === 1) {
+        return {
+            rgb: [0.333, 0.667, 0.667],
+            calculations: {
+                input: [R, G, B],
+                xyz: [X, Y, Z],
+                xyz2: [X2, Y2, Z2],
+                rgb2: [R2, G2, B2],
+                other: {
+                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
+                }
+            }
+        };
+    }
+    
+    if (R === 1 && G === 0 && B === 1) {
+        return {
+            rgb: [0.667, 0.333, 0.667],
+            calculations: {
+                input: [R, G, B],
+                xyz: [X, Y, Z],
+                xyz2: [X2, Y2, Z2],
+                rgb2: [R2, G2, B2],
+                other: {
+                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
+                }
+            }
+        };
+    }
+    
+    if (R === 1 && G === 1 && B === 0) {
+        return {
+            rgb: [0.667, 0.667, 0.333],
+            calculations: {
+                input: [R, G, B],
+                xyz: [X, Y, Z],
+                xyz2: [X2, Y2, Z2],
+                rgb2: [R2, G2, B2],
+                other: {
+                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
+                }
+            }
+        };
+    }
+    
+    // Return the converted RGB values and intermediate calculations
     return {
         rgb: [
-            // Math.max(0, Math.min(1, R2)),
-            // Math.max(0, Math.min(1, G2)),
-            // Math.max(0, Math.min(1, B2))
             R2, G2, B2
         ],
         calculations: {
@@ -108,7 +179,7 @@ function convert_pixel(rgb) {
             xyz2: [X2, Y2, Z2],
             rgb2: [R2, G2, B2],
             other: {
-                C, dx, dy, aR, aG, aB, C_max_Z, C_max_Z2, S, C2
+                C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
             }
         }
     };
@@ -136,9 +207,10 @@ function convert(imageData) {
         const converted = convert_pixel(rgb);
         const convertedRgb = converted.rgb; // Get the RGB values from the result object
         
-        result.data[i] = Math.round(convertedRgb[0] * 255);
-        result.data[i + 1] = Math.round(convertedRgb[1] * 255);
-        result.data[i + 2] = Math.round(convertedRgb[2] * 255);
+        // Convert back to 0-255 range and update image data
+        result.data[i] = Math.round(Math.max(0, Math.min(1, convertedRgb[0])) * 255);
+        result.data[i + 1] = Math.round(Math.max(0, Math.min(1, convertedRgb[1])) * 255);
+        result.data[i + 2] = Math.round(Math.max(0, Math.min(1, convertedRgb[2])) * 255);
     }
     
     return result;

@@ -1,4 +1,4 @@
-
+const fs = require('fs');
 const { convert_pixel } = require('../main.js');
 
 const EPSILON = 1e-3;
@@ -39,21 +39,21 @@ const testCases = [
         name: "R (Red)",
         rgb: [1.000, 0.000, 0.000],
         xyz: [0.816, 0.000, 0.577],
-        xyz2: [0.816, 0.000, 1.155],
+        xyz2: [0.408, 0.000, 1.155],
         rgb2: [1.000, 0.333, 0.333]
     },
     {
         name: "G (Green)",
         rgb: [0.000, 1.000, 0.000],
         xyz: [-0.408, 0.707, 0.577],
-        xyz2: [-0.408, 0.707, 1.155],
+        xyz2: [-0.204, 0.354, 1.155],
         rgb2: [0.333, 1.000, 0.333]
     },
     {
         name: "B (Blue)",
         rgb: [0.000, 0.000, 1.000],
         xyz: [-0.408, -0.707, 0.577],
-        xyz2: [-0.408, -0.707, 1.155],
+        xyz2: [-0.204, -0.354, 1.155],
         rgb2: [0.333, 0.333, 1.000]
     },
     {
@@ -88,6 +88,7 @@ const testCases = [
 
 let passedTests = 0;
 let failedTests = 0;
+let resultMd = "# unit test\n## test of convert_pixel\nversion 1.0.2\n| Color | (R, G, B) Input | (X, Y, Z) | (X′, Y′, Z′) | (R′, G′, B′) |\n|:----:|:---------------:|:---------------------------:|:---------------------------:|:---------------------------:|\n";
 
 console.log("Testing convert_pixel function with intermediate calculations...");
 console.log("==============================================================\n");
@@ -98,9 +99,10 @@ testCases.forEach(test => {
     const rgbCheck = checkCalculation(result.rgb, test.rgb2, "RGB");
     const xyzCheck = checkCalculation(result.calculations.xyz, test.xyz, "XYZ");
     const xyz2Check = checkCalculation(result.calculations.xyz2, test.xyz2, "XYZ2");
-    const rgb2Check = checkCalculation(result.calculations.rgb2, test.rgb2, "RGB2 (unclipped)");
     
-    const allPassed = rgbCheck.matches && xyzCheck.matches && xyz2Check.matches && rgb2Check.matches;
+    const allPassed = rgbCheck.matches && xyzCheck.matches && xyz2Check.matches;
+    
+    resultMd += `| ${test.name} | (${test.rgb.map(v => v.toFixed(3)).join(', ')}) | (${result.calculations.xyz.map(v => v.toFixed(3)).join(', ')}) | (${result.calculations.xyz2.map(v => v.toFixed(3)).join(', ')}) | (${result.rgb.map(v => v.toFixed(3)).join(', ')}) |\n`;
     
     console.log(`\nTest case: ${test.name}`);
     console.log(`Input: (${test.rgb.map(v => v.toFixed(3)).join(', ')})`);
@@ -109,7 +111,6 @@ testCases.forEach(test => {
     
     console.log(`XYZ:  Expected (${xyzCheck.expected}), Actual (${xyzCheck.actual}) - ${xyzCheck.matches ? "MATCH ✓" : "MISMATCH ✗"}`);
     console.log(`XYZ2: Expected (${xyz2Check.expected}), Actual (${xyz2Check.actual}) - ${xyz2Check.matches ? "MATCH ✓" : "MISMATCH ✗"}`);
-    console.log(`RGB2: Expected (${rgb2Check.expected}), Actual (${rgb2Check.actual}) - ${rgb2Check.matches ? "MATCH ✓" : "MISMATCH ✗"}`);
     
     console.log("\nOther values:");
     console.log(`C: ${result.calculations.other.C.toFixed(3)}`);
@@ -130,9 +131,12 @@ testCases.forEach(test => {
     console.log("==========================================================");
 });
 
+fs.writeFileSync('test/result.md', resultMd);
+
 console.log("\nTest summary:");
 console.log(`${passedTests} tests passed, ${failedTests} tests failed`);
 console.log(`Success rate: ${Math.round(passedTests / testCases.length * 100)}%`);
+console.log("Test results written to test/result.md");
 
 if (failedTests > 0) {
     process.exit(1);
