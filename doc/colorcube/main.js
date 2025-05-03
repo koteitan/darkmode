@@ -96,22 +96,41 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Draw the intersection polygon on canvas
   function drawIntersection() {
-    const targetZ = parseFloat(slider.value);
-    displayZ.textContent = targetZ.toFixed(2);
+    const sliderValue = parseFloat(slider.value);
+    const targetZBlack = sliderValue;
+    const targetZBlue = 1 - sliderValue;
+    displayZ.textContent = `Z: ${targetZBlack.toFixed(2)}, 1-Z: ${targetZBlue.toFixed(2)}`;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
-    const intersections = computeIntersections(targetZ);
-    if (intersections.length >= 3) {
-      const sortedPoints = sortPoints(intersections);
+    // Draw black intersection (computed with Z = slider value)
+    const intersectionsBlack = computeIntersections(targetZBlack);
+    if (intersectionsBlack.length >= 3) {
+      const sortedBlack = sortPoints(intersectionsBlack);
       ctx.beginPath();
-      const [startX, startY] = mapToCanvas(sortedPoints[0][0], sortedPoints[0][1]);
+      const [startX, startY] = mapToCanvas(sortedBlack[0][0], sortedBlack[0][1]);
       ctx.moveTo(startX, startY);
-      sortedPoints.forEach(point => {
+      sortedBlack.forEach(point => {
         const [x, y] = mapToCanvas(point[0], point[1]);
         ctx.lineTo(x, y);
       });
       ctx.closePath();
       ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    // Draw blue intersection (computed with 1 - slider value)
+    const intersectionsBlue = computeIntersections(targetZBlue);
+    if (intersectionsBlue.length >= 3) {
+      const sortedBlue = sortPoints(intersectionsBlue);
+      ctx.beginPath();
+      const [startX, startY] = mapToCanvas(sortedBlue[0][0], sortedBlue[0][1]);
+      ctx.moveTo(startX, startY);
+      sortedBlue.forEach(point => {
+        const [x, y] = mapToCanvas(point[0], point[1]);
+        ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.strokeStyle = 'red';
       ctx.lineWidth = 2;
       ctx.stroke();
     }

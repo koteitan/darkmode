@@ -15,7 +15,7 @@
       XYZ = (1 / np.sqrt(3)) * (T @ RGB)
       X, Y, Z = XYZ
       ```
-    - The intersection is drawn with solid black lines.
+    - The intersection is drawn in two parts: a solid black line computed using Z (slider value), and a solid red line computed using 1-Z.
     - The intersection polygon will be either a triangle or a hexagon.
     - A gray grid with a spacing of 0.1 is drawn over the canvas within the coordinate range [-1, +1].
     - An overlay displays the vector diagrams for the standard colors: R, G, B, C, M, Y. These vectors are drawn from the origin after applying the same transformation.
