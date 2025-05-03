@@ -1,0 +1,26 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+canvas {
+  border: 1px solid #ccc;
+  display: block;
+  margin: 20px auto;
+}
+
+h1 {
+  color: #333;
+}
+
+input[type="range"] {
+  width: 300px;
+  margin: 10px 0;
+}
+
+label, span {
+  font-size: 1rem;
+  color: #555;
+}
