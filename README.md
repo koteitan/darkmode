@@ -32,10 +32,7 @@ $$
 \begin{aligned}
 dx &= \frac{X}{\sqrt{X^2+Y^2}},\\[6pt]
 dy &= \frac{Y}{\sqrt{X^2+Y^2}}\\
-a_R &= \frac{2}{\sqrt{6}}\,dx,\\[6pt]
-a_G &= -\frac{1}{\sqrt{6}}\,dx+\frac{1}{\sqrt{2}}\,dy,\\[6pt]
-a_B &= -\frac{1}{\sqrt{6}}\,dx-\frac{1}{\sqrt{2}}\,dy,\\
-u_k &= \frac{1+\operatorname{sign}(a_k)}{2},\\
+\begin{pmatrix} a_R \\ a_G \\ a_B \end{pmatrix} &= T^{-1}\begin{pmatrix} dx \\ dy \\ 0 \end{pmatrix},\\
 \operatorname{Cmax}(Z_{\text{val}},\, dx,\, dy)&= \min_{k \in \{R,G,B\}} \left\{ \max\left\{0,\; \frac{\frac{1+\operatorname{sign}(a_k)}{2} - \frac{Z_{\text{val}}}{\sqrt{3}}}{a_k} \right\} \right\}.
 \end{aligned}
 $$
@@ -44,12 +41,13 @@ $$
 
 $$
 \begin{aligned}
-Z2 &= \sqrt{3} - Z,\\
-C &= \sqrt{X^2+Y^2},\\
-C2 &= \frac{C\, C_{\max Z2}}{C_{\max Z}},\\
-X' &= \frac{C2}{C}\,X,\\
-Y' &= \frac{C2}{C}\,Y,\\
-Z' &= Z2.
+\begin{pmatrix} X' \\ Y' \\ Z' \end{pmatrix} 
+&=
+\begin{pmatrix}
+\frac{C_{\max (\sqrt{3}-Z)}}{C_{\max Z}}\,X \\[8pt]
+\frac{C_{\max (\sqrt{3}-Z)}}{C_{\max Z}}\,Y \\[8pt]
+\sqrt{3}-Z
+\end{pmatrix}.
 \end{aligned}
 $$
 
