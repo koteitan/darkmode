@@ -42,8 +42,8 @@ For each channel, define:
 $$
 \begin{aligned}
 a_R &= \frac{2}{\sqrt{6}}\,dx,\\[6pt]
-a_G &= -\frac{1}{\sqrt{6}}\,dx + \frac{1}{\sqrt{2}}\,dy,\\[6pt]
-a_B &= -\frac{1}{\sqrt{6}}\,dx - \frac{1}{\sqrt{2}}\,dy,
+a_G &= -\frac{1}{\sqrt{6}}\,dx+\frac{1}{\sqrt{2}}\,dy,\\[6pt]
+a_B &= -\frac{1}{\sqrt{6}}\,dx-\frac{1}{\sqrt{2}}\,dy,
 \end{aligned}
 $$
 
@@ -56,13 +56,15 @@ u_k &= \frac{1+\operatorname{sign}(a_k)}{2},\\[6pt]
 \end{aligned}
 $$
 
-Then, the function
+Then, we define
 
 $$
-\operatorname{Cmax}(Z_{\text{val}},\, dx,\, dy)
+\operatorname{Cmax}(Z_{\text{val}},\, dx,\, dy)= \min\Biggl\{
+\max\Bigl\{0,\; \frac{\frac{1+\operatorname{sign}(a_R)}{2} -\frac{Z_{\text{val}}}{\sqrt{3}}}{a_R}\Bigr\},\;
+\max\Bigl\{0,\; \frac{\frac{1+\operatorname{sign}(a_G)}{2} -\frac{Z_{\text{val}}}{\sqrt{3}}}{a_G}\Bigr\},\;
+\max\Bigl\{0,\; \frac{\frac{1+\operatorname{sign}(a_B)}{2} -\frac{Z_{\text{val}}}{\sqrt{3}}}{a_B}\Bigr\}
+\Biggr\}.
 $$
-
-is defined as the minimum non-negative value among \(\text{limit}_R\), \(\text{limit}_G\), and \(\text{limit}_B\).
 
 ### Dark mode conversion
 
@@ -93,17 +95,17 @@ $$
   * 'convert' function: converts the entire input image to an output image using the 'convert_pixel' function.
   * 'convert_pixel' function: converts R,G,B to R2,G2,B2
 
-    * input: array of [R, G, B] (0 ≤ R,G,B ≤ 1)
+    * input: array of [R, G, B] (0 ≤ R, G, B ≤ 1)
     * output: array of [R2, G2, B2], converted by version 1.0.4 (direction-dependent chroma limit)
 
 * index.html
 
-  * input image
-  * output image (can be saved by right-clicking)
-  * image loading button
-    * loads a new image from file selection dialog onto the input image
-  * convert button
-    * converts the input image to the output image
+  * input image  
+  * output image (can be saved by right-clicking)  
+  * image loading button  
+    * loads a new image from file selection dialog onto the input image  
+  * convert button  
+    * converts the input image to the output image  
   * no additional JavaScript libraries
 
 * others (CSS and supporting files as needed)
