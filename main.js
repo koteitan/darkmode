@@ -49,7 +49,7 @@ function convert_pixel(rgb) {
     const validTerms = [
         termR1, termG1, termB1, 
         termR0, termG0, termB0
-    ].filter(term => term !== 0 && isFinite(term));
+    ]; // Removed filter as requested
     
     const C_max_Z = validTerms.length > 0 ? Math.min(...validTerms) : 0;
     
@@ -73,7 +73,7 @@ function convert_pixel(rgb) {
     const validTerms2 = [
         termR1_2, termG1_2, termB1_2, 
         termR0_2, termG0_2, termB0_2
-    ].filter(term => term !== 0 && isFinite(term));
+    ]; // Removed filter as requested
     
     const C_max_Z2 = validTerms2.length > 0 ? Math.min(...validTerms2) : 0;
     
