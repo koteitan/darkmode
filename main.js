@@ -2,7 +2,7 @@
 /**
  * Converts a single RGB pixel to dark mode
  * @param {Array} rgb - RGB values as array [R,G,B] where 0 <= R,G,B <= 1
- * @returns {Array} - Converted R'G'B' values as array [R2,G2,B2]
+ * @returns {Object} - Object containing converted values and intermediate calculations
  */
 function convert_pixel(rgb) {
     const R = rgb[0];
@@ -39,11 +39,22 @@ function convert_pixel(rgb) {
     const G2 = (-X2/Math.sqrt(6) + Y2/Math.sqrt(2) + Z2/Math.sqrt(3));
     const B2 = (-X2/Math.sqrt(6) - Y2/Math.sqrt(2) + Z2/Math.sqrt(3));
     
-    return [
-        Math.max(0, Math.min(1, R2)),
-        Math.max(0, Math.min(1, G2)),
-        Math.max(0, Math.min(1, B2))
-    ];
+    return {
+        rgb: [
+            Math.max(0, Math.min(1, R2)),
+            Math.max(0, Math.min(1, G2)),
+            Math.max(0, Math.min(1, B2))
+        ],
+        calculations: {
+            input: [R, G, B],
+            xyz: [X, Y, Z],
+            xyz2: [X2, Y2, Z2],
+            rgb2: [R2, G2, B2],
+            other: {
+                C, C_max_Z, C_max_Z2, S, C2
+            }
+        }
+    };
 }
 
 /**
@@ -66,10 +77,11 @@ function convert(imageData) {
         ];
         
         const converted = convert_pixel(rgb);
+        const convertedRgb = converted.rgb; // Get the RGB values from the result object
         
-        result.data[i] = Math.round(converted[0] * 255);
-        result.data[i + 1] = Math.round(converted[1] * 255);
-        result.data[i + 2] = Math.round(converted[2] * 255);
+        result.data[i] = Math.round(convertedRgb[0] * 255);
+        result.data[i + 1] = Math.round(convertedRgb[1] * 255);
+        result.data[i + 2] = Math.round(convertedRgb[2] * 255);
     }
     
     return result;
