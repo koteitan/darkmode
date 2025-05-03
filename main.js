@@ -49,19 +49,13 @@ function convert_pixel(rgb) {
     const C_max_Z = dirCmax(Z, dx, dy);
     const C_max_Z2 = dirCmax(Z2, dx, dy);
     
-    let S = 0;
-    if (C !== 0 && C_max_Z !== 0) {
-        S = C / C_max_Z;
+    let factor = 0;
+    if (C_max_Z !== 0) {
+         factor = C_max_Z2 / C_max_Z;
     }
     
-    const C2 = S * C_max_Z2;
-    
-    let X2 = 0;
-    let Y2 = 0;
-    if (C !== 0) {
-        X2 = (C2 / C) * X;
-        Y2 = (C2 / C) * Y;
-    }
+    const X2 = factor * X;
+    const Y2 = factor * Y;
     
     const R2 = (2*X2/sqrt6 + Z2/sqrt3);
     const G2 = (-X2/sqrt6 + Y2/sqrt2 + Z2/sqrt3);
@@ -86,7 +80,7 @@ function convert_pixel(rgb) {
             xyz2: [X2, Y2, Z2],
             rgb2: [R2, G2, B2],
             other: {
-                C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
+                C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2
             }
         }
     };

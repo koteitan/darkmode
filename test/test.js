@@ -1,3 +1,4 @@
+#!/usr/bin/node
 const fs = require('fs');
 const { convert_pixel } = require('../main.js');
 
@@ -119,12 +120,12 @@ desiredOrder.forEach(name => {
     // First conversion row
     const row1 = `| ${label} | ${formatVector(test.rgb)} | ${formatVector(result1.calculations.xyz)} | ${formatVector(result1.calculations.xyz2)} | ${formatVector(result1.rgb)} |`;
     // Second conversion row with prime symbol
-    const row2 = `| ${label}' | ${formatVector(result1.rgb)} | ${formatVector(result2.calculations.xyz)} | ${formatVector(result2.calculations.xyz2)} | ${formatVector(result2.rgb)} |`;
+    const row2 = `| ${label}'| ${formatVector(result1.rgb)} | ${formatVector(result2.calculations.xyz)} | ${formatVector(result2.calculations.xyz2)} | ${formatVector(result2.rgb)} |`;
     
     resultMd += row1 + "\n" + row2 + "\n";
 });
 
-fs.writeFileSync('test/result.md', resultMd);
+fs.writeFileSync('result.md', resultMd);
 
 console.log("Test results written to test/result.md");
 process.exit(0);
