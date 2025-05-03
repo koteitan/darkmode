@@ -49,9 +49,10 @@ function convert_pixel(rgb) {
     
     return {
         rgb: [
-            Math.max(0, Math.min(1, R2)),
-            Math.max(0, Math.min(1, G2)),
-            Math.max(0, Math.min(1, B2))
+            // Math.max(0, Math.min(1, R2)),
+            // Math.max(0, Math.min(1, G2)),
+            // Math.max(0, Math.min(1, B2))
+            R2, G2, B2
         ],
         calculations: {
             input: [R, G, B],
