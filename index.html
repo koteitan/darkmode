@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Mode Converter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Dark Mode Image Converter</h1>
+        <p>Convert your images to dark mode using orthogonal basis transformation</p>
+    </header>
+    
+    <main>
+        <div class="image-container">
+            <div class="image-box">
+                <h2>Input Image</h2>
+                <canvas id="input-canvas"></canvas>
+                <div class="controls">
+                    <button id="load-image">Load Image</button>
+                    <input type="file" id="file-input" accept="image/*" style="display: none;">
+                </div>
+            </div>
+            
+            <div class="image-box">
+                <h2>Output Image</h2>
+                <canvas id="output-canvas"></canvas>
+                <div class="controls">
+                    <button id="convert-button">Convert</button>
+                    <p id="save-instruction">Right-click image to save</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Dark Mode Conversion Algorithm v1.0.0</p>
+    </footer>
+    
+    <script src="main.js"></script>
+    <script>
+        // Initialize canvases
+        const inputCanvas = document.getElementById('input-canvas');
+        const outputCanvas = document.getElementById('output-canvas');
+        const inputCtx = inputCanvas.getContext('2d');
+        const outputCtx = outputCanvas.getContext('2d');
+        let inputImage = null;
+        
+        // Set up file input
+        document.getElementById('load-image').addEventListener('click', function() {
+            document.getElementById('file-input').click();
+        });
+        
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    inputImage = new Image();
+                    inputImage.onload = function() {
+                        // Resize canvas to match image dimensions
+                        inputCanvas.width = inputImage.width;
+                        inputCanvas.height = inputImage.height;
+                        outputCanvas.width = inputImage.width;
+                        outputCanvas.height = inputImage.height;
+                        
+                        // Draw the image on the input canvas
+                        inputCtx.drawImage(inputImage, 0, 0);
+                    };
+                    inputImage.src = event.target.result;
+                };
+                
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+        
+        // Set up convert button
+        document.getElementById('convert-button').addEventListener('click', function() {
+            if (inputImage) {
+                // Get the image data from input canvas
+                const imageData = inputCtx.getImageData(0, 0, inputCanvas.width, inputCanvas.height);
+                
+                // Convert the image
+                const convertedData = convert(imageData);
+                
+                // Put the converted image data on output canvas
+                outputCtx.putImageData(convertedData, 0, 0);
+            } else {
+                alert('Please load an image first');
+            }
+        });
+    </script>
+</body>
+</html>
