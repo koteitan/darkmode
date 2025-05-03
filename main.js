@@ -13,51 +13,31 @@ function convert_pixel(rgb) {
     const Y = (G - B) / Math.sqrt(2);
     const Z = (R + G + B) / Math.sqrt(3);
     
-    const Z_prime = Math.sqrt(3) - Z;
+    const Z2 = Math.sqrt(3) - Z;
     
     const C = Math.sqrt(X*X + Y*Y);
     
     const C_max_Z = Math.sqrt(2) * Math.min(Z, Math.sqrt(3) - Z);
     
-    const C_max_Z_prime = Math.sqrt(2) * Math.min(Z_prime, Math.sqrt(3) - Z_prime);
+    const C_max_Z2 = Math.sqrt(2) * Math.min(Z2, Math.sqrt(3) - Z2);
     
     let S = 0;
     if (C !== 0 && C_max_Z !== 0) {
         S = C / C_max_Z;
     }
     
-    const C_prime = S * C_max_Z_prime;
+    const C2 = S * C_max_Z2;
     
-    let X_prime = 0;
-    let Y_prime = 0;
+    let X2 = 0;
+    let Y2 = 0;
     if (C !== 0) {
-        X_prime = (C_prime / C) * X;
-        Y_prime = (C_prime / C) * Y;
+        X2 = (C2 / C) * X;
+        Y2 = (C2 / C) * Y;
     }
     
-    const sqrt3 = Math.sqrt(3);
-    const offset = 0.333 * sqrt3;
-    
-    let R2 = (2*X_prime/Math.sqrt(6) + Z_prime/Math.sqrt(3));
-    let G2 = (-X_prime/Math.sqrt(6) + Y_prime/Math.sqrt(2) + Z_prime/Math.sqrt(3));
-    let B2 = (-X_prime/Math.sqrt(6) - Y_prime/Math.sqrt(2) + Z_prime/Math.sqrt(3));
-    
-    if ((R === 0 && G === 1 && B === 1) || // Cyan
-        (R === 1 && G === 0 && B === 1) || // Magenta
-        (R === 1 && G === 1 && B === 0)) { // Yellow
-        
-        if (R === 0 && G === 1 && B === 1 && R2 < 0.1) {
-            R2 = 0.333;
-        }
-        
-        if (R === 1 && G === 0 && B === 1 && G2 < 0.1) {
-            G2 = 0.333;
-        }
-        
-        if (R === 1 && G === 1 && B === 0 && B2 < 0.1) {
-            B2 = 0.333;
-        }
-    }
+    const R2 = (2*X2/Math.sqrt(6) + Z2/Math.sqrt(3));
+    const G2 = (-X2/Math.sqrt(6) + Y2/Math.sqrt(2) + Z2/Math.sqrt(3));
+    const B2 = (-X2/Math.sqrt(6) - Y2/Math.sqrt(2) + Z2/Math.sqrt(3));
     
     return [
         Math.max(0, Math.min(1, R2)),
