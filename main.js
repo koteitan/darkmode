@@ -1,6 +1,6 @@
 
 /**
- * Converts a single RGB pixel to dark mode
+ * Converts a single RGB pixel to dark mode (version 1.0.1)
  * @param {Array} rgb - RGB values as array [R,G,B] where 0 <= R,G,B <= 1
  * @returns {Object} - Object containing converted values and intermediate calculations
  */
@@ -17,9 +17,65 @@ function convert_pixel(rgb) {
     
     const C = Math.sqrt(X*X + Y*Y);
     
-    const C_max_Z = Math.sqrt(2) * Math.min(Z, Math.sqrt(3) - Z);
+    let dx = 0;
+    let dy = 0;
+    if (C > 0) {
+        dx = X / C;
+        dy = Y / C;
+    }
     
-    const C_max_Z2 = Math.sqrt(2) * Math.min(Z2, Math.sqrt(3) - Z2);
+    const aR = (2 * dx) / Math.sqrt(6);
+    const aG = (-dx / Math.sqrt(6)) + (dy / Math.sqrt(2));
+    const aB = (-dx / Math.sqrt(6)) - (dy / Math.sqrt(2));
+    
+    
+    const zTerm = Z / Math.sqrt(3);
+    
+    let termR1 = 0;
+    let termG1 = 0;
+    let termB1 = 0;
+    let termR0 = 0;
+    let termG0 = 0;
+    let termB0 = 0;
+    
+    if (aR > 0) termR1 = Math.max(0, 1 - zTerm) / aR;
+    if (aG > 0) termG1 = Math.max(0, 1 - zTerm) / aG;
+    if (aB > 0) termB1 = Math.max(0, 1 - zTerm) / aB;
+    
+    if (aR < 0) termR0 = Math.max(0, 0 - zTerm) / aR;
+    if (aG < 0) termG0 = Math.max(0, 0 - zTerm) / aG;
+    if (aB < 0) termB0 = Math.max(0, 0 - zTerm) / aB;
+    
+    const validTerms = [
+        termR1, termG1, termB1, 
+        termR0, termG0, termB0
+    ].filter(term => term !== 0 && isFinite(term));
+    
+    const C_max_Z = validTerms.length > 0 ? Math.min(...validTerms) : 0;
+    
+    const z2Term = Z2 / Math.sqrt(3);
+    
+    let termR1_2 = 0;
+    let termG1_2 = 0;
+    let termB1_2 = 0;
+    let termR0_2 = 0;
+    let termG0_2 = 0;
+    let termB0_2 = 0;
+    
+    if (aR > 0) termR1_2 = Math.max(0, 1 - z2Term) / aR;
+    if (aG > 0) termG1_2 = Math.max(0, 1 - z2Term) / aG;
+    if (aB > 0) termB1_2 = Math.max(0, 1 - z2Term) / aB;
+    
+    if (aR < 0) termR0_2 = Math.max(0, 0 - z2Term) / aR;
+    if (aG < 0) termG0_2 = Math.max(0, 0 - z2Term) / aG;
+    if (aB < 0) termB0_2 = Math.max(0, 0 - z2Term) / aB;
+    
+    const validTerms2 = [
+        termR1_2, termG1_2, termB1_2, 
+        termR0_2, termG0_2, termB0_2
+    ].filter(term => term !== 0 && isFinite(term));
+    
+    const C_max_Z2 = validTerms2.length > 0 ? Math.min(...validTerms2) : 0;
     
     let S = 0;
     if (C !== 0 && C_max_Z !== 0) {
@@ -52,7 +108,7 @@ function convert_pixel(rgb) {
             xyz2: [X2, Y2, Z2],
             rgb2: [R2, G2, B2],
             other: {
-                C, C_max_Z, C_max_Z2, S, C2
+                C, dx, dy, aR, aG, aB, C_max_Z, C_max_Z2, S, C2
             }
         }
     };
