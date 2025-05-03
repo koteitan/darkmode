@@ -46,8 +46,7 @@ $$
 \begin{aligned}
 Z2 &= \sqrt{3} - Z,\\
 C &= \sqrt{X^2+Y^2},\\
-S &= \frac{C}{C_{\max Z}},\\
-C2 &= S\cdot C_{\max Z2},\\
+C2 &= \frac{C\, C_{\max Z2}}{C_{\max Z}},\\
 X' &= \frac{C2}{C}\,X,\\
 Y' &= \frac{C2}{C}\,Y,\\
 Z' &= Z2.
