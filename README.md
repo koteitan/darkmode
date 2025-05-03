@@ -4,6 +4,7 @@ my darkmode conversion (program by Devin)
 ## conversion specification
 version 1.0.0
 ### Normalized orthogonal basis
+```tex
 \[
 \begin{aligned}
 \mathbf{e}_x &= \dfrac{1}{\sqrt{6}} (2,\,-1,\,-1), \\[24pt]
@@ -12,8 +13,10 @@ version 1.0.0
 \end{aligned}
 \]
 where \(\mathbf{e}_x, \mathbf{e}_y, \mathbf{e}_z\) are orthonormal and span the RGB space.
+```
 
 ### Transformation
+```tex
 \[
 \begin{pmatrix}
 X \\ Y \\ Z
@@ -28,8 +31,9 @@ X \\ Y \\ Z
 R \\ G \\ B
 \end{pmatrix}
 \]
-
+```
 ### Dark mode conversion
+```tex
 \[
 \begin{aligned}
 Z' &= \sqrt{3} - Z \\[24pt]
@@ -47,8 +51,9 @@ C' &= S \cdot C_{\max}(Z') \\[24pt]
 \end{cases}
 \end{aligned}
 \]
-
+```
 ### Inverse transformation
+```tex
 \[
 \begin{pmatrix}
 R' \\ G' \\ B'
@@ -63,6 +68,7 @@ R' \\ G' \\ B'
 X' \\ Y' \\ Z'
 \end{pmatrix}
 \]
+```
 
 ## test site specification
 - main.js
