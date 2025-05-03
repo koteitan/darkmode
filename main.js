@@ -35,14 +35,11 @@ function convert_pixel(rgb) {
         const aG = (-1 / sqrt6) * dx + (1 / sqrt2) * dy;
         const aB = (-1 / sqrt6) * dx - (1 / sqrt2) * dy;
         
-        const uR = (1 + Math.sign(aR)) / 2;
-        const uG = (1 + Math.sign(aG)) / 2;
-        const uB = (1 + Math.sign(aB)) / 2;
-        
-        for (const [a_k, u_k] of [[aR, uR], [aG, uG], [aB, uB]]) {
+        for (const a_k of [aR, aG, aB]) {
             if (a_k !== 0) {
-                const limit = Math.max(0, (u_k - Z_val / sqrt3) / a_k);
-                t_max = Math.min(t_max, limit);
+                const u_k = (1 + Math.sign(a_k)) / 2;
+                const limit = (u_k - Z_val / sqrt3) / a_k;
+                t_max = Math.min(t_max, Math.max(0, limit));
             }
         }
         
@@ -77,96 +74,6 @@ function convert_pixel(rgb) {
     const uR = (1 + Math.sign(aR)) / 2;
     const uG = (1 + Math.sign(aG)) / 2;
     const uB = (1 + Math.sign(aB)) / 2;
-    
-    if (R === 1 && G === 0 && B === 0) {
-        return {
-            rgb: [1.0, 0.333, 0.333],
-            calculations: {
-                input: [R, G, B],
-                xyz: [X, Y, Z],
-                xyz2: [X2, Y2, Z2],
-                rgb2: [R2, G2, B2],
-                other: {
-                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
-                }
-            }
-        };
-    }
-    
-    if (R === 0 && G === 1 && B === 0) {
-        return {
-            rgb: [0.333, 1.0, 0.333],
-            calculations: {
-                input: [R, G, B],
-                xyz: [X, Y, Z],
-                xyz2: [X2, Y2, Z2],
-                rgb2: [R2, G2, B2],
-                other: {
-                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
-                }
-            }
-        };
-    }
-    
-    if (R === 0 && G === 0 && B === 1) {
-        return {
-            rgb: [0.333, 0.333, 1.0],
-            calculations: {
-                input: [R, G, B],
-                xyz: [X, Y, Z],
-                xyz2: [X2, Y2, Z2],
-                rgb2: [R2, G2, B2],
-                other: {
-                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
-                }
-            }
-        };
-    }
-    
-    if (R === 0 && G === 1 && B === 1) {
-        return {
-            rgb: [0.333, 0.667, 0.667],
-            calculations: {
-                input: [R, G, B],
-                xyz: [X, Y, Z],
-                xyz2: [X2, Y2, Z2],
-                rgb2: [R2, G2, B2],
-                other: {
-                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
-                }
-            }
-        };
-    }
-    
-    if (R === 1 && G === 0 && B === 1) {
-        return {
-            rgb: [0.667, 0.333, 0.667],
-            calculations: {
-                input: [R, G, B],
-                xyz: [X, Y, Z],
-                xyz2: [X2, Y2, Z2],
-                rgb2: [R2, G2, B2],
-                other: {
-                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
-                }
-            }
-        };
-    }
-    
-    if (R === 1 && G === 1 && B === 0) {
-        return {
-            rgb: [0.667, 0.667, 0.333],
-            calculations: {
-                input: [R, G, B],
-                xyz: [X, Y, Z],
-                xyz2: [X2, Y2, Z2],
-                rgb2: [R2, G2, B2],
-                other: {
-                    C, dx, dy, aR, aG, aB, uR, uG, uB, C_max_Z, C_max_Z2, S, C2
-                }
-            }
-        };
-    }
     
     // Return the converted RGB values and intermediate calculations
     return {
