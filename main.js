@@ -43,35 +43,9 @@ function convert_pixel(rgb) {
         }
     }
     
-    let R2 = (2*X2/Math.sqrt(6) + Z2/Math.sqrt(3));
-    let G2 = (-X2/Math.sqrt(6) + Y2/Math.sqrt(2) + Z2/Math.sqrt(3));
-    let B2 = (-X2/Math.sqrt(6) - Y2/Math.sqrt(2) + Z2/Math.sqrt(3));
-    
-    if (R === 1 && G === 0 && B === 0) { // Red
-        R2 = 1.0;
-        G2 = 0.333;
-        B2 = 0.333;
-    } else if (R === 0 && G === 1 && B === 0) { // Green
-        R2 = 0.333;
-        G2 = 1.0;
-        B2 = 0.333;
-    } else if (R === 0 && G === 0 && B === 1) { // Blue
-        R2 = 0.333;
-        G2 = 0.333;
-        B2 = 1.0;
-    } else if (R === 0 && G === 1 && B === 1) { // Cyan
-        R2 = 0.333;
-        G2 = 0.667;
-        B2 = 0.667;
-    } else if (R === 1 && G === 0 && B === 1) { // Magenta
-        R2 = 0.667;
-        G2 = 0.333;
-        B2 = 0.667;
-    } else if (R === 1 && G === 1 && B === 0) { // Yellow
-        R2 = 0.667;
-        G2 = 0.667;
-        B2 = 0.333;
-    }
+    const R2 = (2*X2/Math.sqrt(6) + Z2/Math.sqrt(3));
+    const G2 = (-X2/Math.sqrt(6) + Y2/Math.sqrt(2) + Z2/Math.sqrt(3));
+    const B2 = (-X2/Math.sqrt(6) - Y2/Math.sqrt(2) + Z2/Math.sqrt(3));
     
     return {
         rgb: [
